@@ -5,7 +5,7 @@
 # Title: Revisiting a classic hybrid zone: rapid movement of the
 #        northern flicker hybrid zone in contemporary times
 # Journal Info: TBD
-# bioRxiv DOI: TBD
+# bioRxiv DOI: 10.1101/2021.08.16.456504
 #
 # Edited date: June 2021
 #
