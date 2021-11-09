@@ -5,9 +5,9 @@
 # Title: Revisiting a classic hybrid zone: rapid movement of the
 #        northern flicker hybrid zone in contemporary times
 # Journal Info: TBD
-# bioRxiv DOI: TBD
+# bioRxiv DOI: 10.1101/2021.08.16.456504
 #
-# Edited date: June 2021
+# Edited date: Oct 2021
 #
 # Please cite the paper if you use these scripts
 #
@@ -661,3 +661,74 @@ summary(bootstrap_malar_h)
 sink()
 
 write.table(boot_df_malar_h,"./cline-output-scores/bootstrap-CI_malar_h.txt",row.names=FALSE,sep="\t",quote=FALSE)
+
+
+
+
+
+
+
+
+
+### TESTING INFLUENCE OF INCLUDING SAMPLES ON THE NORTH PLATTE
+
+# load datasets
+contemporary <- read_tsv("scoring_contemporary_input.txt",col_names=TRUE)
+
+# filter dataset to remove samples on the North Platte
+S_contemporary <- contemporary %>%
+  filter(!site_ID %in% c(6,9,11,13,16,17))
+
+
+# set up parameters
+# cline for HI
+rhs <- function(x, c, w) {
+  1/(1+exp((4*(x-c))/w))
+}
+
+# for plotting bootstrap
+s <- seq(0,800,length=100)
+
+
+
+### HYBRID INDEX
+# modelling the cline
+m_standHI_SPlatte_c <- nls(standHI_mean ~ rhs(dist, center, width),
+                   data=S_contemporary,
+                   start=list(center=390,width=390),
+                   trace=T)
+
+# summarizing the output
+summary(m_standHI_SPlatte_c)
+coef(m_standHI_SPlatte_c)
+
+# calculating a confidence interval
+CI_standHI_SPlatte_c <- confint(m_standHI_SPlatte_c,parm=c("center","width"))
+CI_standHI_SPlatte_c
+
+# bootstrapping the output
+bootstrap_standHI_SPlatte_c <- nlsBoot(m_standHI_SPlatte_c,niter=999)
+summary(bootstrap_standHI_SPlatte_c)
+boot_coeff_standHI_SPlatte_c <- bootstrap_standHI_SPlatte_c$coefboot
+
+# bootstrapping for plotting
+y_standHI_SPlatte_c <- matrix(NA,nrow=length(bootstrap_standHI_SPlatte_c),ncol=length(s))
+for(i in 1:length(bootstrap_standHI_SPlatte_c)){
+  y_standHI_SPlatte_c[i,]=rhs(s,boot_coeff_standHI_SPlatte_c[i,1],boot_coeff_standHI_SPlatte_c[i,2])
+}
+boot_ci_standHI_SPlatte_c <- apply(y_standHI_SPlatte_c,2,quantile,c(0.025,0.975))
+boot_df_standHI_SPlatte_c <- data.frame(s,t(boot_ci_standHI_SPlatte_c))
+names(boot_df_standHI_SPlatte_c) = c("dist","lower","upper")
+
+sink("./cline-output-scores/standHI_SPlatte_c_output.txt")
+print('##### MODEL SUMMARY #####')
+summary(m_standHI_SPlatte_c)
+print('##### COEFF FROM MODEL #####')
+coef(m_standHI_SPlatte_c)
+print('##### CI FROM MODEL #####')
+CI_standHI_SPlatte_c
+print('##### BOOTSTRAP SUMMARY #####')
+summary(bootstrap_standHI_SPlatte_c)
+sink()
+
+write.table(boot_df_standHI_SPlatte_c,"./cline-output-scores/bootstrap-CI_standHI_SPlatte_c.txt",row.names=FALSE,sep="\t",quote=FALSE)
