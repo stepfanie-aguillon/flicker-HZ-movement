@@ -5,9 +5,9 @@
 # Title: Revisiting a classic hybrid zone: rapid movement of the
 #        northern flicker hybrid zone in contemporary times
 # Journal Info: TBD
-# bioRxiv DOI: TBD
+# bioRxiv DOI: 10.1101/2021.08.16.456504
 #
-# Edited date: June 2021
+# Edited date: Oct 2021
 #
 # Please cite the paper if you use these scripts
 #
@@ -71,7 +71,7 @@ fig2b <- ggplot(data=models, aes(x=trait,y=center, color=transect,shape=transect
   scale_color_manual(values=c("black","gray55")) +
   scale_shape_manual(values=c(16,17)) +
   coord_flip() +
-  ylim(c(0,800)) +
+  ylim(c(0,400)) +
   xlab("Trait") +
   ylab("Distance (km)") +
   theme_bw() +
@@ -157,3 +157,44 @@ contemporary_clines <- ggplot() +
 
 grid.arrange(historic_clines,contemporary_clines,nrow=2)
 # save plot as PDF with dimensions 5" x 8"
+
+
+
+
+
+
+# influence of including samples on the North Platte (supplement)
+
+# load dataset, edit to add in info on North v South Platte
+contemporary <- read_tsv("scoring_contemporary_input.txt",col_names=TRUE)
+contemporary <- contemporary %>%
+  mutate(Platte = ifelse(site_ID %in% c(6,9,11,13,16,17),"North Platte","South Platte"))
+# filter dataset to remove samples on the North Platte
+S_contemporary <- contemporary %>%
+  filter(!site_ID %in% c(6,9,11,13,16,17))
+
+# load boostrapping results
+bootstrap_c <- read_tsv("./cline-output-scores/bootstrap-CI_standHI_c.txt",col_names=TRUE)
+bootstrap_cS <- read_tsv("./cline-output-scores/bootstrap-CI_standHI_SPlatte_c.txt",col_names=TRUE)
+
+# standardized hybrid index
+ggplot() +
+  # contemporary, standard HI, BLACK
+  geom_ribbon(data=bootstrap_c,aes(x=dist,ymin=lower,ymax=upper),alpha=0.25,fill="gray44") +
+  geom_smooth(data=contemporary,aes(x=dist,y=standHI_mean),method="nls",formula=y~1/(1+exp((4*(x-c))/w)),se=FALSE,method.args=list(start=list(c=360,w=360)),color="black",size=2) +
+  geom_pointrange(data=contemporary,aes(x=dist,y=standHI_mean,ymin=standHI_mean-standHI_se,ymax=standHI_mean+standHI_se,shape=Platte),color="black") +
+  
+  # make the North Platte localities open circles
+  scale_shape_manual(values=c(21,16)) +
+  
+  # contemporary without North Platte, standard HI, RED
+  geom_ribbon(data=bootstrap_cS,aes(x=dist,ymin=lower,ymax=upper),alpha=0.25,fill="gray44") +
+  geom_smooth(data=S_contemporary,aes(x=dist,y=standHI_mean),method="nls",formula=y~1/(1+exp((4*(x-c))/w)),se=FALSE,method.args=list(start=list(c=360,w=360)),color="#DC3220",size=1,linetype="longdash") +
+
+  ylim(c(-0.01,1.01)) +
+  xlim(c(-10,810)) +
+  xlab("Distance (km)") +
+  ylab("Hybrid index") +
+  theme_bw() +
+  theme(axis.title=element_text(face="bold",size=12), axis.text=element_text(size=10,color="black"),legend.position="none")
+# save plot as PDF with dimensions 4" x 5"
