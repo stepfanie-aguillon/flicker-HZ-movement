@@ -5,9 +5,9 @@
 # Title: Revisiting a classic hybrid zone: rapid movement of the
 #        northern flicker hybrid zone in contemporary times
 # Journal Info: TBD
-# bioRxiv DOI: TBD
+# bioRxiv DOI: 10.1101/2021.08.16.456504
 #
-# Edited date: June 2021
+# Edited date: Oct 2021
 #
 # Please cite the paper if you use these scripts
 #
@@ -123,3 +123,90 @@ historic_summary <- sub_summary %>%
 historic_merge <- inner_join(historic_summary,locale_df,by="site_ID") %>%
   dplyr::select(site_ID,site_name,samples,latitude:dist,shaft_mean:standHI_se)
 write.table(historic_merge,"scoring_historic_input.txt",quote=FALSE,sep="\t",row.names=FALSE)
+
+
+
+
+
+### DATASETS FOR SEPARATE SEXES 
+
+# MALES ONLY
+sub_summary_males <- sub_df %>%
+  filter(sex=="Male") %>%
+  group_by(HZtransect,site_ID) %>%
+  summarize(samples=n(),
+            shaft_mean = mean(na.omit(shaft)),
+            shaft_se = sd(na.omit(shaft))/samples,
+            nuchal_mean = mean(na.omit(nuchal)),
+            nuchal_se = sd(na.omit(nuchal))/samples, 
+            crown_mean = mean(na.omit(crown)),
+            crown_se = sd(na.omit(crown))/samples, 
+            ears_mean = mean(na.omit(ear_coverts)),
+            ears_se = sd(na.omit(ear_coverts))/samples,
+            throat_mean = mean(na.omit(throat)),
+            throat_se = sd(na.omit(throat))/samples,
+            malar_mean = mean(na.omit(as.integer(malar))),
+            malar_se = sd(na.omit(as.integer(malar)))/samples,
+            standHI_mean = mean(na.omit(standHI)),
+            standHI_se = sd(na.omit(standHI))/samples) %>%
+  arrange(site_ID)
+
+# contemporary samples
+contemporary_males_summary <- sub_summary_males %>%
+  filter(HZtransect=="contemporary") %>%
+  ungroup()
+# merge the two datasets and reorder columns
+contemporary_males_merge <- inner_join(contemporary_males_summary,locale_df,by="site_ID") %>%
+  dplyr::select(site_ID,site_name,samples,latitude:dist,shaft_mean:standHI_se)
+write.table(contemporary_males_merge,"scoring_contemporary_input_males.txt",quote=FALSE,sep="\t",row.names=FALSE)
+
+# historic samples
+historic_males_summary <- sub_summary_males %>%
+  filter(HZtransect=="historic") %>%
+  ungroup()
+# merge the two datasets and reorder columns
+historic_males_merge <- inner_join(historic_males_summary,locale_df,by="site_ID") %>%
+  dplyr::select(site_ID,site_name,samples,latitude:dist,shaft_mean:standHI_se)
+write.table(historic_males_merge,"scoring_historic_input_males.txt",quote=FALSE,sep="\t",row.names=FALSE)
+
+
+
+
+# FEMALES ONLY
+sub_summary_females <- sub_df %>%
+  filter(sex=="Female") %>%
+  group_by(HZtransect,site_ID) %>%
+  summarize(samples=n(),
+            shaft_mean = mean(na.omit(shaft)),
+            shaft_se = sd(na.omit(shaft))/samples,
+            nuchal_mean = mean(na.omit(nuchal)),
+            nuchal_se = sd(na.omit(nuchal))/samples, 
+            crown_mean = mean(na.omit(crown)),
+            crown_se = sd(na.omit(crown))/samples, 
+            ears_mean = mean(na.omit(ear_coverts)),
+            ears_se = sd(na.omit(ear_coverts))/samples,
+            throat_mean = mean(na.omit(throat)),
+            throat_se = sd(na.omit(throat))/samples,
+            #malar_mean = mean(na.omit(as.integer(malar))),
+            #malar_se = sd(na.omit(as.integer(malar)))/samples,
+            standHI_mean = mean(na.omit(standHI)),
+            standHI_se = sd(na.omit(standHI))/samples) %>%
+  arrange(site_ID)
+
+# contemporary samples
+contemporary_females_summary <- sub_summary_females %>%
+  filter(HZtransect=="contemporary") %>%
+  ungroup()
+# merge the two datasets and reorder columns
+contemporary_females_merge <- inner_join(contemporary_females_summary,locale_df,by="site_ID") %>%
+  dplyr::select(site_ID,site_name,samples,latitude:dist,shaft_mean:standHI_se)
+write.table(contemporary_females_merge,"scoring_contemporary_input_females.txt",quote=FALSE,sep="\t",row.names=FALSE)
+
+# historic samples
+historic_females_summary <- sub_summary_females %>%
+  filter(HZtransect=="historic") %>%
+  ungroup()
+# merge the two datasets and reorder columns
+historic_females_merge <- inner_join(historic_females_summary,locale_df,by="site_ID") %>%
+  dplyr::select(site_ID,site_name,samples,latitude:dist,shaft_mean:standHI_se)
+write.table(historic_females_merge,"scoring_historic_input_females.txt",quote=FALSE,sep="\t",row.names=FALSE)
