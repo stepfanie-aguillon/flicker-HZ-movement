@@ -1,11 +1,11 @@
 # This script contains the R code to map sampling localities.
 #
 # Authors: Aguillon SM, VG Rohwer
-# Year: 2021
-# Title: Revisiting a classic hybrid zone: rapid movement of the
+# Year: 2022
+# Title: Revisiting a classic hybrid zone: movement of the
 #        northern flicker hybrid zone in contemporary times
-# Journal Info: TBD
-# bioRxiv DOI: 10.1101/2021.08.16.456504
+# Journal Info: Evolution
+# DOI: 10.1111/evo.14474
 #
 # Edited date: June 2021
 #
